@@ -1,0 +1,10 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.autoSave": "afterDelay",
+  "cSpell.words": ["astype", "BTCUSDT", "ccxt", "dotenv", "iloc", "ohlcv"]
+}
