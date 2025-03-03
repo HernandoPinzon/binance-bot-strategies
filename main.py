@@ -1,6 +1,6 @@
 from multiprocessing import Process, Queue
 import time
-from config import ENABLE_PLOT
+from config import ENABLE_PLOT, INTERVAL, IntervalsInSeconds
 from strategies.ema_strategy import check_signals, place_order
 from utils.binance_client import get_binance_client
 from utils.data_fetcher import get_data
@@ -36,7 +36,7 @@ def main():
         if signal in ["BUY", "SELL"]:
             place_order(signal, client)
 
-        time.sleep(60)
+        time.sleep(IntervalsInSeconds[INTERVAL])
 
 
 # ✅ Asegurar que el script se ejecuta correctamente en Windows
