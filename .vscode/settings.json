@@ -6,5 +6,21 @@
     "source.organizeImports": "explicit"
   },
   "files.autoSave": "afterDelay",
-  "cSpell.words": ["astype", "BTCUSDT", "ccxt", "dotenv", "iloc", "ohlcv"]
+  "cSpell.words": [
+    "astype",
+    "binance",
+    "BNBUSDT",
+    "BTCUSDT",
+    "ccxt",
+    "dotenv",
+    "ETHUSDT",
+    "iloc",
+    "klines",
+    "LTCUSDT",
+    "ohlcv",
+    "xdata",
+    "xlabel",
+    "ydata",
+    "ylabel"
+  ]
 }
