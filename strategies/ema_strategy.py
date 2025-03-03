@@ -89,6 +89,8 @@ def place_order(order_type, client):
         # Extraer información de la orden
         executed_price = float(order["fills"][0]["price"])  # Precio real de ejecución
         fee = sum(float(f["commission"]) for f in order["fills"])  # Comisiones totales
+        if fee == 0:
+            fee = 0.001 * executed_price * quantity
 
         profit_loss = 0  # Inicializar ganancias/pérdidas
         if order_type == OrderTypes.BUY:
