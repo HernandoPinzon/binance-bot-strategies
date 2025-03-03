@@ -2,7 +2,7 @@ from services import save_to_csv
 from datetime import datetime
 
 # Archivo CSV y Base de datos
-CSV_FILE = "trading_historyV2.csv"
+CSV_FILE = "trading_historyV3.csv"
 DB_PATH = "trading_history.db"
 
 # Columnas esperadas
@@ -13,7 +13,8 @@ HEADERS = [
     "Quantity",
     "Fee",
     "Profit/Loss",
-    "Balance",
+    "Balance C1",
+    "Balance C2",
     "EMA Short",
     "EMA Long",
     "Interval",
@@ -31,7 +32,8 @@ def save_order(
     quantity,
     fee,
     profit_loss,
-    balance,
+    balance_c1,
+    balance_c2,
     ema_short,
     ema_long,
     interval,
@@ -47,7 +49,8 @@ def save_order(
         format_number(quantity),
         format_number(fee),
         format_number(profit_loss),
-        format_number(balance),
+        format_number(balance_c1),
+        format_number(balance_c2),
         format_number(ema_short),
         format_number(ema_long),
         interval,

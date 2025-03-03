@@ -65,19 +65,25 @@ def check_signals(queue):
 
 def place_order(order_type, client):
     try:
+        if not hasattr(place_order, "last_sell_price"):
+            place_order.last_sell_price = 0  # Inicializar con 0 o un valor adecuado
         if not hasattr(place_order, "last_buy_price"):
             place_order.last_buy_price = 0  # Inicializar con 0 o un valor adecuado
+
         min_trade_size = get_min_trade_size(SYMBOL.value, client)
         account_info = client.get_account()
-        balance = next(
+        balance_c1 = next(
             asset for asset in account_info["balances"] if asset["asset"] == "LTC"
+        )["free"]
+        balance_c2 = next(
+            asset for asset in account_info["balances"] if asset["asset"] == "USDT"
         )["free"]
         ticker = client.get_symbol_ticker(symbol=SYMBOL.value)
         current_price = float(ticker["price"])
         quantity = TRADE_AMOUNT_USDT / current_price
         quantity = round(quantity - (quantity % min_trade_size), 6)
         print(
-            f"🔹 Enviando orden: {order_type} - Símbolo: {SYMBOL.value} - Cantidad: {quantity} - Balance: {balance}"
+            f"🔹 Enviando orden: {order_type} - Símbolo: {SYMBOL.value} - Cantidad: {quantity} - Balance: {balance_c1}"
         )
         order = client.create_order(
             symbol=SYMBOL.value,
@@ -92,11 +98,13 @@ def place_order(order_type, client):
         if fee == 0:
             fee = 0.001 * executed_price * quantity
 
-        profit_loss = 0  # Inicializar ganancias/pérdidas
+        profit_loss = 0
         if order_type == OrderTypes.BUY:
+            profit_loss = (place_order.last_sell_price - executed_price) * quantity
             place_order.last_buy_price = executed_price  # Guardamos precio de compra
             print("🟢 ORDEN DE COMPRA:", order)
         elif order_type == OrderTypes.SELL:
+            place_order.last_sell_price = executed_price  # Guardamos precio de compra
             profit_loss = (executed_price - place_order.last_buy_price) * quantity
             print("🔴 ORDEN DE VENTA:", order)
         else:
@@ -107,7 +115,8 @@ def place_order(order_type, client):
             quantity=quantity,
             fee=fee,
             profit_loss=profit_loss,
-            balance=balance,
+            balance_c1=balance_c1,
+            balance_c2=balance_c2,
             ema_short=EMA_SHORT_PERIOD,  # Guardamos el periodo configurado (ej. 10)
             ema_long=EMA_LONG_PERIOD,  # Guardamos el periodo configurado (ej. 50)
             interval=INTERVAL.value,  # Guardamos el intervalo configurado (ej. 1m)

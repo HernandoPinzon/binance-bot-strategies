@@ -36,11 +36,11 @@ IntervalsInSeconds = {
 # Parámetros de la estrategia
 SYMBOL = SYMBOLS.LTC_USDT
 INTERVAL = INTERVALS.M1
-TRADE_AMOUNT_USDT = 10  # Cantidad fija en USDT por operación
+TRADE_AMOUNT_USDT = 100  # Cantidad fija en USDT por operación
 EMA_SHORT_PERIOD = 10
 EMA_LONG_PERIOD = 50
 
-ENABLE_PLOT = True  # Activa o desactiva el gráfico en tiempo real
+ENABLE_PLOT = False  # Activa o desactiva el gráfico en tiempo real
 
 DB_CONFIG = {
     "name": os.getenv("DB_NAME"),
