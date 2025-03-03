@@ -1,8 +1,28 @@
-import csv
-import os
+from services import save_to_csv
 from datetime import datetime
 
-CSV_FILE = "trading_history.csv"
+# Archivo CSV y Base de datos
+CSV_FILE = "trading_historyV2.csv"
+DB_PATH = "trading_history.db"
+
+# Columnas esperadas
+HEADERS = [
+    "Timestamp",
+    "Order Type",
+    "Price",
+    "Quantity",
+    "Fee",
+    "Profit/Loss",
+    "Balance",
+    "EMA Short",
+    "EMA Long",
+    "Interval",
+]
+
+
+def format_number(value):
+    """Convierte un número a cadena con coma en lugar de punto."""
+    return str(value).replace(".", ",")
 
 
 def save_order(
@@ -16,43 +36,25 @@ def save_order(
     ema_long,
     interval,
 ):
-    """Guarda los datos de una orden en un archivo CSV"""
-    file_exists = os.path.isfile(CSV_FILE)
+    """Guarda una orden en CSV y SQL llamando a los servicios correspondientes."""
 
-    with open(CSV_FILE, mode="a", newline="") as file:
-        writer = csv.writer(file)
+    # Datos formateados
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    row_data = [
+        timestamp,
+        order_type,
+        format_number(price),
+        format_number(quantity),
+        format_number(fee),
+        format_number(profit_loss),
+        format_number(balance),
+        format_number(ema_short),
+        format_number(ema_long),
+        interval,
+    ]
 
-        # Escribir encabezado si el archivo es nuevo
-        if not file_exists:
-            writer.writerow(
-                [
-                    "Timestamp",
-                    "Order Type",
-                    "Price",
-                    "Quantity",
-                    "Fee",
-                    "Profit/Loss",
-                    "Balance",
-                    "EMA Short",
-                    "EMA Long",
-                    "Interval",
-                ]
-            )
+    # Guardar en CSV
+    save_to_csv(CSV_FILE, HEADERS, row_data)
 
-        # Escribir la orden
-        writer.writerow(
-            [
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                order_type,
-                price,
-                quantity,
-                fee,
-                profit_loss,
-                balance,
-                ema_short,
-                ema_long,
-                interval,
-            ]
-        )
-
-    print(f"💾 Orden guardada en {CSV_FILE}")
+    # Guardar en SQL (sin cambiar la coma para evitar problemas con cálculos)
+    # save_to_sql(DB_PATH, "orders", HEADERS, row_data)

@@ -1,7 +1,7 @@
 import pandas as pd
 from utils.ccxt_client import exchange
 from utils.save_data import save_order
-from utils.trading_helpers import calculate_ema, get_min_notional
+from utils.trading_helpers import calculate_ema, get_min_notional, get_min_trade_size
 from config import (
     OrderTypes,
     SYMBOL,
@@ -13,36 +13,39 @@ from config import (
 import time
 import datetime
 
+first_run = True
+
 
 def check_signals(queue):
     """Verifica señales de compra o venta usando los datos de la cola"""
+    global first_run
     if queue.empty():
-        return None  # Si no hay datos, no hacer nada
-
-    df = queue.get()  # Obtener los datos más recientes
+        return None
+    df = queue.get()
 
     df["EMA_10"] = calculate_ema(df, EMA_SHORT_PERIOD)
     df["EMA_50"] = calculate_ema(df, EMA_LONG_PERIOD)
-
-    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")  # Convertir timestamp
-    df["time"] = df["timestamp"].dt.strftime("%H:%M:%S")  # Crear la columna 'time'
+    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+    df["time"] = df["timestamp"].dt.strftime("%H:%M:%S")
 
     last_row = df.iloc[-1]
-    prev_row = df.iloc[-2]  # Fila anterior para comparar cruce
+    prev_row = df.iloc[-2]
 
     # Calcular diferencia porcentual con respecto al precio
     ema_diff_percentage = (
         (last_row["EMA_10"] - last_row["EMA_50"]) / last_row["close"]
     ) * 100
-
     print(f"{last_row['time']} EMA: {ema_diff_percentage:.2f}%")
 
-    # Agregar impresión con time actual
-    """ now = datetime.datetime.now().strftime("%H:%M:%S")
-
-    print(
-        f"REAL_TIME: {now} - MARKET_TIME: {last_row['time']} - Precio: {last_row['close']} - EMA_10: {last_row['EMA_10']:.2f} - EMA_50: {last_row['EMA_50']:.2f}"
-    ) """
+    # 🚀 Primera vez: Comprar o vender según la tendencia actual
+    if first_run:
+        first_run = False  # Desactivar la bandera después de la primera ejecución
+        if last_row["EMA_10"] > last_row["EMA_50"]:
+            print("📌 Primera ejecución: Se detecta tendencia alcista → COMPRA")
+            return OrderTypes.BUY
+        else:
+            print("📌 Primera ejecución: Se detecta tendencia bajista → VENTA")
+            return OrderTypes.SELL
 
     if (
         prev_row["EMA_10"] < prev_row["EMA_50"]
@@ -62,19 +65,19 @@ def check_signals(queue):
 
 def place_order(order_type, client):
     try:
-
-        ticker = client.get_symbol_ticker(SYMBOL.value)
-        current_price = float(ticker["last"])  # Último precio del activo
-        if order_type == OrderTypes.BUY:
-            quantity = TRADE_AMOUNT_USDT / current_price  # Cantidad en BTC a comprar
-        elif order_type == OrderTypes.SELL:
-            quantity = TRADE_AMOUNT_USDT / current_price  # Cantidad en BTC a vender
-        else:
-            print("⚠️ Tipo de orden no reconocido")
-            return
-        quantity = round(quantity, 6)
+        if not hasattr(place_order, "last_buy_price"):
+            place_order.last_buy_price = 0  # Inicializar con 0 o un valor adecuado
+        min_trade_size = get_min_trade_size(SYMBOL.value, client)
+        account_info = client.get_account()
+        balance = next(
+            asset for asset in account_info["balances"] if asset["asset"] == "LTC"
+        )["free"]
+        ticker = client.get_symbol_ticker(symbol=SYMBOL.value)
+        current_price = float(ticker["price"])
+        quantity = TRADE_AMOUNT_USDT / current_price
+        quantity = round(quantity - (quantity % min_trade_size), 6)
         print(
-            f"🔹 Enviando orden: {order_type} - Símbolo: {SYMBOL.value} - Cantidad: {quantity}"
+            f"🔹 Enviando orden: {order_type} - Símbolo: {SYMBOL.value} - Cantidad: {quantity} - Balance: {balance}"
         )
         order = client.create_order(
             symbol=SYMBOL.value,
@@ -86,8 +89,8 @@ def place_order(order_type, client):
         # Extraer información de la orden
         executed_price = float(order["fills"][0]["price"])  # Precio real de ejecución
         fee = sum(float(f["commission"]) for f in order["fills"])  # Comisiones totales
-        balance = client.fetch_balance()["total"]["USDT"]  # Saldo total en USDT
 
+        profit_loss = 0  # Inicializar ganancias/pérdidas
         if order_type == OrderTypes.BUY:
             place_order.last_buy_price = executed_price  # Guardamos precio de compra
             print("🟢 ORDEN DE COMPRA:", order)

@@ -1,6 +1,7 @@
 # config.py
 
 from enum import Enum
+import os
 
 
 class SYMBOLS(Enum):
@@ -31,3 +32,11 @@ EMA_SHORT_PERIOD = 10
 EMA_LONG_PERIOD = 50
 
 ENABLE_PLOT = True  # Activa o desactiva el gráfico en tiempo real
+
+DB_CONFIG = {
+    "name": os.getenv("DB_NAME"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT"),
+}
