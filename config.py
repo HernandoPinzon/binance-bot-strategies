@@ -35,7 +35,7 @@ IntervalsInSeconds = {
 
 # Parámetros de la estrategia
 SYMBOL = SYMBOLS.LTC_USDT
-INTERVAL = INTERVALS.S1
+INTERVAL = INTERVALS.M1
 TRADE_AMOUNT_USDT = 10  # Cantidad fija en USDT por operación
 EMA_SHORT_PERIOD = 10
 EMA_LONG_PERIOD = 50
