@@ -2,7 +2,7 @@ from services import save_to_csv
 from datetime import datetime
 
 # Archivo CSV y Base de datos
-CSV_FILE = "trading_historyV3.csv"
+CSV_FILE = "trading_historyV4.csv"
 DB_PATH = "trading_history.db"
 
 # Columnas esperadas
@@ -11,13 +11,10 @@ HEADERS = [
     "Order Type",
     "Price",
     "Quantity",
-    "Fee",
-    "Profit/Loss",
-    "Balance C1",
-    "Balance C2",
     "EMA Short",
     "EMA Long",
     "Interval",
+    "Symbol",
 ]
 
 
@@ -27,33 +24,26 @@ def format_number(value):
 
 
 def save_order(
+    transact_time,
     order_type,
     price,
     quantity,
-    fee,
-    profit_loss,
-    balance_c1,
-    balance_c2,
     ema_short,
     ema_long,
     interval,
+    symbol,
 ):
     """Guarda una orden en CSV y SQL llamando a los servicios correspondientes."""
 
-    # Datos formateados
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     row_data = [
-        timestamp,
+        transact_time,
         order_type,
         format_number(price),
         format_number(quantity),
-        format_number(fee),
-        format_number(profit_loss),
-        format_number(balance_c1),
-        format_number(balance_c2),
         format_number(ema_short),
         format_number(ema_long),
         interval,
+        symbol,
     ]
 
     # Guardar en CSV

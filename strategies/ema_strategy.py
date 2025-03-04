@@ -31,95 +31,70 @@ def check_signals(queue):
     last_row = df.iloc[-1]
     prev_row = df.iloc[-2]
 
-    # Calcular diferencia porcentual con respecto al precio
     ema_diff_percentage = (
         (last_row["EMA_10"] - last_row["EMA_50"]) / last_row["close"]
     ) * 100
-    print(f"{last_row['time']} EMA: {ema_diff_percentage:.2f}%")
-
-    # 🚀 Primera vez: Comprar o vender según la tendencia actual
+    ema_diff_percentage_last = (
+        (last_row["EMA_10"] - last_row["EMA_50"]) / last_row["close"]
+    ) * 100
+    if ema_diff_percentage > ema_diff_percentage_last:
+        print(f"EMA: 🟢{ema_diff_percentage:.2f}%")
+    else:
+        print(f"EMA: 🔴{ema_diff_percentage:.2f}%")
     if first_run:
-        first_run = False  # Desactivar la bandera después de la primera ejecución
+        first_run = False
         if last_row["EMA_10"] > last_row["EMA_50"]:
-            print("📌 Primera ejecución: Se detecta tendencia alcista → COMPRA")
-            return OrderTypes.BUY
+            return OrderTypes.BUY, last_row["close"]
         else:
-            print("📌 Primera ejecución: Se detecta tendencia bajista → VENTA")
-            return OrderTypes.SELL
-
+            return OrderTypes.SELL, last_row["close"]
     if (
         prev_row["EMA_10"] < prev_row["EMA_50"]
         and last_row["EMA_10"] > last_row["EMA_50"]
     ):
         print("Señal de COMPRA detectada (EMA_10 cruzó hacia arriba EMA_50)")
-        return OrderTypes.BUY
+        return OrderTypes.BUY, last_row["close"]
 
     if (
         prev_row["EMA_10"] > prev_row["EMA_50"]
         and last_row["EMA_10"] < last_row["EMA_50"]
     ):
         print("Señal de VENTA detectada (EMA_10 cruzó hacia abajo EMA_50)")
-        return "SELL"
-    return "HOLD"
+        return "SELL", last_row["close"]
+    return "HOLD", last_row["close"]
 
 
-def place_order(order_type, client):
+def place_order(order_type, client, min_trade_size, current_price):
+    current_time = datetime.datetime.now().strftime("%M:%S")
+    print(f"🔹INIT {current_time}")
     try:
-        if not hasattr(place_order, "last_sell_price"):
-            place_order.last_sell_price = 0  # Inicializar con 0 o un valor adecuado
-        if not hasattr(place_order, "last_buy_price"):
-            place_order.last_buy_price = 0  # Inicializar con 0 o un valor adecuado
-
-        min_trade_size = get_min_trade_size(SYMBOL.value, client)
-        account_info = client.get_account()
-        balance_c1 = next(
-            asset for asset in account_info["balances"] if asset["asset"] == "LTC"
-        )["free"]
-        balance_c2 = next(
-            asset for asset in account_info["balances"] if asset["asset"] == "USDT"
-        )["free"]
-        ticker = client.get_symbol_ticker(symbol=SYMBOL.value)
-        current_price = float(ticker["price"])
         quantity = TRADE_AMOUNT_USDT / current_price
         quantity = round(quantity - (quantity % min_trade_size), 6)
-        print(
-            f"🔹 Enviando orden: {order_type} - Símbolo: {SYMBOL.value} - Cantidad: {quantity} - Balance: {balance_c1}"
-        )
+        current_time = datetime.datetime.now().strftime("%M:%S")
+        print(f"🔹{current_time} {order_type} CurrentPrice: {current_price}")
         order = client.create_order(
             symbol=SYMBOL.value,
             side=order_type,
             type="MARKET",
             quantity=quantity,
         )
+        # Extraer y formatear transactTime
+        transact_time = order["transactTime"]
+        transact_time_formatted = datetime.datetime.fromtimestamp(
+            transact_time / 1000
+        ).strftime("%H:%M:%S")
 
         # Extraer información de la orden
         executed_price = float(order["fills"][0]["price"])  # Precio real de ejecución
-        fee = sum(float(f["commission"]) for f in order["fills"])  # Comisiones totales
-        if fee == 0:
-            fee = 0.001 * executed_price * quantity
-
-        profit_loss = 0
-        if order_type == OrderTypes.BUY:
-            profit_loss = (place_order.last_sell_price - executed_price) * quantity
-            place_order.last_buy_price = executed_price  # Guardamos precio de compra
-            print("🟢 ORDEN DE COMPRA:", order)
-        elif order_type == OrderTypes.SELL:
-            place_order.last_sell_price = executed_price  # Guardamos precio de compra
-            profit_loss = (executed_price - place_order.last_buy_price) * quantity
-            print("🔴 ORDEN DE VENTA:", order)
-        else:
-            profit_loss = 0
+        print(f"🔹{executed_price}")
         save_order(
+            transact_time=transact_time_formatted,
             order_type=order_type,
             price=executed_price,
             quantity=quantity,
-            fee=fee,
-            profit_loss=profit_loss,
-            balance_c1=balance_c1,
-            balance_c2=balance_c2,
-            ema_short=EMA_SHORT_PERIOD,  # Guardamos el periodo configurado (ej. 10)
-            ema_long=EMA_LONG_PERIOD,  # Guardamos el periodo configurado (ej. 50)
-            interval=INTERVAL.value,  # Guardamos el intervalo configurado (ej. 1m)
+            ema_short=EMA_SHORT_PERIOD,
+            ema_long=EMA_LONG_PERIOD,
+            interval=INTERVAL.value,
+            symbol=SYMBOL.value,
         )
     except Exception as e:
         print(f"❌ ERROR AL EJECUTAR ORDEN: {e}")

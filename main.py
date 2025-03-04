@@ -1,27 +1,28 @@
 from multiprocessing import Process, Queue
 import time
-from config import ENABLE_PLOT, INTERVAL, IntervalsInSeconds
+from config import ENABLE_PLOT, INTERVAL, SYMBOL, IntervalsInSeconds
 from strategies.ema_strategy import check_signals, place_order
 from utils.binance_client import get_binance_client
 from utils.data_fetcher import get_data
 from utils.live_plot import live_plot
 from dotenv import load_dotenv
 
+from utils.trading_helpers import get_min_trade_size
+
 load_dotenv()
 client = get_binance_client()
 
+# Obtener min_trade_size una sola vez
+min_trade_size = get_min_trade_size(SYMBOL.value, client)
+
 
 def main():
-    queue_trading = Queue()  # Cola para el bot de trading
-    queue_plot = Queue()  # Cola separada para el gráfico
+    queue_trading = Queue()
+    queue_plot = Queue()  # No se usa, pero se mantiene para evitar errores
 
     # Crear proceso para obtener datos
     data_process = Process(target=get_data, args=(queue_trading, queue_plot))
     data_process.start()
-
-    if ENABLE_PLOT:
-        plot_process = Process(target=live_plot, args=(queue_plot,))
-        plot_process.start()
 
     # Esperar hasta que haya datos en la cola de trading
     print("Esperando datos de Binance...")
@@ -30,13 +31,19 @@ def main():
         time.sleep(1)
 
     print("Datos recibidos")
+
+    last_signal = None  # Guarda la última señal ejecutada
+
     # Bucle de trading
     while True:
-        signal = check_signals(queue_trading)
-        if signal in ["BUY", "SELL"]:
-            place_order(signal, client)
+        result = check_signals(queue_trading)
+        if result is not None:
+            signal, current_price = result
+            if signal in ["BUY", "SELL"] and signal != last_signal:
+                place_order(signal, client, min_trade_size, current_price)
+                last_signal = signal  # Actualizar la última señal ejecutada
 
-        time.sleep(IntervalsInSeconds[INTERVAL])
+        time.sleep(1)
 
 
 # ✅ Asegurar que el script se ejecuta correctamente en Windows

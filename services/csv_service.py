@@ -14,5 +14,3 @@ def save_to_csv(file_path, headers, row_data, delimiter=";"):
 
         # Escribir los datos en el archivo
         writer.writerow(row_data)
-
-    print(f"💾 Datos guardados en {file_path}")

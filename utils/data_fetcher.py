@@ -1,10 +1,11 @@
 import pandas as pd
 import time
+import datetime
 from utils.ccxt_client import exchange
 from config import SYMBOL, INTERVAL
 
 
-def get_data(queue_trading, queue_plot):
+def get_data(queue_trading, _):
     """Obtiene datos de Binance y los envía a la cola compartida.
     - La primera vez trae 100 datos (histórico).
     - Luego, solo agrega 1 nuevo dato en cada iteración.
@@ -39,14 +40,15 @@ def get_data(queue_trading, queue_plot):
                 ).tail(
                     100
                 )  # Mantener máximo 100 registros
-
         while not queue_trading.empty():
             queue_trading.get()
-        while not queue_plot.empty():
-            queue_plot.get()
-
-        # 🔹 Enviar datos a ambas colas
         queue_trading.put(historical_df)
-        queue_plot.put(historical_df)
 
-        time.sleep(5)  # Espera antes de la siguiente llamada
+        # Imprimir el último precio y la fecha (solo minutos y segundos)
+        last_row = historical_df.iloc[-1]
+        last_time = last_row["timestamp"].strftime("%M:%S")
+        current_time = datetime.datetime.now().strftime("%M:%S")
+        print(
+            f"NOW {current_time} lastPrice: {last_row['close']}, candleTime: {last_time}"
+        )
+        time.sleep(1)
