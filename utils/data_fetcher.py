@@ -13,6 +13,8 @@ def get_data(queue_trading, _):
 
     first_run = True  # Flag para saber si es la primera ejecución
     historical_df = pd.DataFrame()  # DataFrame para almacenar histórico
+    last_price = None
+    last_candle_time = None
 
     while True:
         if first_run:
@@ -40,6 +42,7 @@ def get_data(queue_trading, _):
                 ).tail(
                     100
                 )  # Mantener máximo 100 registros
+
         while not queue_trading.empty():
             queue_trading.get()
         queue_trading.put(historical_df)
@@ -48,7 +51,12 @@ def get_data(queue_trading, _):
         last_row = historical_df.iloc[-1]
         last_time = last_row["timestamp"].strftime("%M:%S")
         current_time = datetime.datetime.now().strftime("%M:%S")
-        print(
-            f"NOW {current_time} lastPrice: {last_row['close']}, candleTime: {last_time}"
-        )
+
+        if last_row["close"] != last_price or last_time != last_candle_time:
+            print(
+                f"NOW {current_time} lastPrice: {last_row['close']}, candleTime: {last_time}"
+            )
+            last_price = last_row["close"]
+            last_candle_time = last_time
+
         time.sleep(1)

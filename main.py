@@ -25,12 +25,11 @@ def main():
     data_process.start()
 
     # Esperar hasta que haya datos en la cola de trading
-    print("Esperando datos de Binance...")
+    print("Esperando datos de Binance", end="")
     while queue_trading.empty():
-        print("...")
+        print(".", end="")
         time.sleep(1)
-
-    print("Datos recibidos")
+    print("\nDatos recibidos")
 
     last_signal = None  # Guarda la última señal ejecutada
 

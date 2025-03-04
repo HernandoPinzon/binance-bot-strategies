@@ -14,11 +14,12 @@ import time
 import datetime
 
 first_run = True
+previous_ema_diff_percentage = None
 
 
 def check_signals(queue):
     """Verifica señales de compra o venta usando los datos de la cola"""
-    global first_run
+    global first_run, previous_ema_diff_percentage
     if queue.empty():
         return None
     df = queue.get()
@@ -35,12 +36,14 @@ def check_signals(queue):
         (last_row["EMA_10"] - last_row["EMA_50"]) / last_row["close"]
     ) * 100
     ema_diff_percentage_last = (
-        (last_row["EMA_10"] - last_row["EMA_50"]) / last_row["close"]
+        (prev_row["EMA_10"] - prev_row["EMA_50"]) / prev_row["close"]
     ) * 100
-    if ema_diff_percentage > ema_diff_percentage_last:
-        print(f"EMA: 🟢{ema_diff_percentage:.2f}%")
-    else:
-        print(f"EMA: 🔴{ema_diff_percentage:.2f}%")
+    if ema_diff_percentage != previous_ema_diff_percentage:
+        if ema_diff_percentage > ema_diff_percentage_last:
+            print(f"EMA: 🟢{ema_diff_percentage:.2f}%")
+        else:
+            print(f"EMA: 🔴{ema_diff_percentage:.2f}%")
+        previous_ema_diff_percentage = ema_diff_percentage
     if first_run:
         first_run = False
         if last_row["EMA_10"] > last_row["EMA_50"]:
