@@ -10,7 +10,6 @@ def get_min_notional(symbol, client):
 
 
 def calculate_ema(df, period):
-    """Calcula la media móvil exponencial (EMA)"""
     return df["close"].ewm(span=period, adjust=False).mean()
 
 

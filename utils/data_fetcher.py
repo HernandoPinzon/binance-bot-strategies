@@ -17,46 +17,56 @@ def get_data(queue_trading, _):
     last_candle_time = None
 
     while True:
-        if first_run:
-            limit = 100  # 🔹 Primera vez: Pedimos 100 datos
-        else:
-            limit = 1  # 🔹 Después: Pedimos solo 1 nuevo
+        limit = 100 if first_run else 1  # 🔹 Primera vez: 100 datos, luego 1 dato nuevo
 
-        ohlcv = exchange.fetch_ohlcv(
-            SYMBOL.value, timeframe=INTERVAL.value, limit=limit
-        )
-
-        new_df = pd.DataFrame(
-            ohlcv, columns=["timestamp", "open", "high", "low", "close", "volume"]
-        )
-        new_df["close"] = new_df["close"].astype(float)
-        new_df["timestamp"] = pd.to_datetime(new_df["timestamp"], unit="ms")
-
-        if first_run:
-            historical_df = new_df  # Guardar los primeros 100 datos
-            first_run = False  # Desactivar la flag
-        else:
-            if new_df.iloc[-1]["timestamp"] != historical_df.iloc[-1]["timestamp"]:
-                historical_df = pd.concat(
-                    [historical_df, new_df], ignore_index=True
-                ).tail(
-                    100
-                )  # Mantener máximo 100 registros
-
-        while not queue_trading.empty():
-            queue_trading.get()
-        queue_trading.put(historical_df)
-
-        # Imprimir el último precio y la fecha (solo minutos y segundos)
-        last_row = historical_df.iloc[-1]
-        last_time = last_row["timestamp"].strftime("%M:%S")
-        current_time = datetime.datetime.now().strftime("%M:%S")
-
-        if last_row["close"] != last_price or last_time != last_candle_time:
-            print(
-                f"NOW {current_time} lastPrice: {last_row['close']}, candleTime: {last_time}"
+        try:
+            # 🔹 Realizar la solicitud a Binance
+            response = exchange.fetch_ohlcv(
+                SYMBOL.value, timeframe=INTERVAL.value, limit=limit
             )
-            last_price = last_row["close"]
-            last_candle_time = last_time
 
-        time.sleep(1)
+            # 🔹 Acceder a los headers de la respuesta
+            headers = exchange.last_response_headers
+            if headers:
+                used_weight = headers.get("X-MBX-USED-WEIGHT-1M", "No disponible")
+                print(f"⚠️ Uso actual de API: {used_weight} / 6000 (1 min)")
+
+            # 🔹 Convertir los datos en DataFrame
+            new_df = pd.DataFrame(
+                response,
+                columns=["timestamp", "open", "high", "low", "close", "volume"],
+            )
+            new_df["close"] = new_df["close"].astype(float)
+            new_df["timestamp"] = pd.to_datetime(new_df["timestamp"], unit="ms")
+
+            if first_run:
+                historical_df = new_df  # Guardar los primeros 100 datos
+                first_run = False  # Desactivar la flag
+            else:
+                if new_df.iloc[-1]["timestamp"] != historical_df.iloc[-1]["timestamp"]:
+                    historical_df = pd.concat(
+                        [historical_df, new_df], ignore_index=True
+                    ).tail(
+                        100
+                    )  # Mantener máximo 100 registros
+
+            while not queue_trading.empty():
+                queue_trading.get()
+            queue_trading.put(historical_df)
+
+            # 🔹 Imprimir el último precio y la fecha
+            last_row = historical_df.iloc[-1]
+            last_time = last_row["timestamp"].strftime("%M:%S")
+            current_time = datetime.datetime.now().strftime("%M:%S")
+
+            if last_row["close"] != last_price or last_time != last_candle_time:
+                print(
+                    f"NOW {current_time} lastPrice: {last_row['close']}, candleTime: {last_time}"
+                )
+                last_price = last_row["close"]
+                last_candle_time = last_time
+
+        except Exception as e:
+            print(f"❌ Error al obtener datos: {e}")
+
+        time.sleep(1)  # Esperar 2 segundos antes de la siguiente petición

@@ -1,7 +1,6 @@
 import pandas as pd
-from utils.ccxt_client import exchange
 from utils.save_data import save_order
-from utils.trading_helpers import calculate_ema, get_min_notional, get_min_trade_size
+from utils.trading_helpers import calculate_ema
 from config import (
     OrderTypes,
     SYMBOL,
@@ -92,12 +91,14 @@ def place_order(order_type, client, min_trade_size, current_price):
         save_order(
             transact_time=transact_time_formatted,
             order_type=order_type,
+            price_on_order=current_price,
             price=executed_price,
             quantity=quantity,
             ema_short=EMA_SHORT_PERIOD,
             ema_long=EMA_LONG_PERIOD,
             interval=INTERVAL.value,
             symbol=SYMBOL.value,
+            csv_file="trading_historyV4.csv",
         )
     except Exception as e:
         print(f"❌ ERROR AL EJECUTAR ORDEN: {e}")
