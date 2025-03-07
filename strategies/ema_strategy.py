@@ -64,7 +64,7 @@ def check_signals(queue):
         return "SELL", last_row["close"]
     return "HOLD", last_row["close"]
 
-
+# en el tintero lo de agregar un stop loss
 def place_order(order_type, client, min_trade_size, current_price):
     current_time = datetime.datetime.now().strftime("%M:%S")
     print(f"🔹INIT {current_time}")

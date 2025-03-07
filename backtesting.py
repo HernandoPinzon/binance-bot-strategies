@@ -1,15 +1,18 @@
 from datetime import datetime
 from dotenv import load_dotenv
 
+from utils.get_unique_filename import get_unique_filename
 from utils.backtesting.data_fetcher import get_data_from_db
 from utils.backtesting.place_order import place_order
 from utils.backtesting.check_signals import check_signals
 
 load_dotenv()
 
-start_date = datetime(2025, 1, 1)
+start_date = datetime(2025, 2, 25)
 end_date = datetime(2025, 3, 1)
 initial_candles = 100
+
+csv_name = get_unique_filename("trading_backtesting_low_prev_candle.csv")
 
 
 def main():
@@ -33,7 +36,12 @@ def main():
         if signal in ["BUY", "SELL"] and signal != last_signal:
             next_candle = db_data.iloc[i + 1] if i + 1 < len(db_data) else None
             if next_candle is not None:
-                place_order(signal, last_candle_checked, next_candle)
+                place_order(
+                    signal,
+                    last_candle_checked,
+                    next_candle,
+                    csv_name,
+                )
                 last_signal = signal
 
 

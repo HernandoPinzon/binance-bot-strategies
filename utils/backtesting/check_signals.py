@@ -1,4 +1,3 @@
-import pandas as pd
 from config import EMA_LONG_PERIOD, EMA_SHORT_PERIOD, OrderTypes
 from utils.trading_helpers import calculate_ema
 
