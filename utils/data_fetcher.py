@@ -29,7 +29,6 @@ def get_data(queue_trading, _):
             headers = exchange.last_response_headers
             if headers:
                 used_weight = headers.get("X-MBX-USED-WEIGHT-1M", "No disponible")
-                print(f"⚠️ Uso actual de API: {used_weight} / 6000 (1 min)")
 
             # 🔹 Convertir los datos en DataFrame
             new_df = pd.DataFrame(
@@ -57,11 +56,10 @@ def get_data(queue_trading, _):
             # 🔹 Imprimir el último precio y la fecha
             last_row = historical_df.iloc[-1]
             last_time = last_row["timestamp"].strftime("%M:%S")
-            current_time = datetime.datetime.now().strftime("%M:%S")
 
             if last_row["close"] != last_price or last_time != last_candle_time:
                 print(
-                    f"NOW {current_time} lastPrice: {last_row['close']}, candleTime: {last_time}"
+                    f"time_candle: {last_time}, {last_row['close']}"
                 )
                 last_price = last_row["close"]
                 last_candle_time = last_time
@@ -69,4 +67,4 @@ def get_data(queue_trading, _):
         except Exception as e:
             print(f"❌ Error al obtener datos: {e}")
 
-        time.sleep(1)  # Esperar 2 segundos antes de la siguiente petición
+        time.sleep(1) 

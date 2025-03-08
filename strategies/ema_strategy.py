@@ -1,4 +1,5 @@
 import pandas as pd
+import state
 from utils.save_data import save_order
 from utils.trading_helpers import calculate_ema
 from config import (
@@ -38,31 +39,28 @@ def check_signals(queue):
         (prev_row["EMA_10"] - prev_row["EMA_50"]) / prev_row["close"]
     ) * 100
     if ema_diff_percentage != previous_ema_diff_percentage:
-        if ema_diff_percentage > ema_diff_percentage_last:
-            print(f"EMA: 🟢{ema_diff_percentage:.2f}%")
-        else:
-            print(f"EMA: 🔴{ema_diff_percentage:.2f}%")
         previous_ema_diff_percentage = ema_diff_percentage
     if first_run:
         first_run = False
         if last_row["EMA_10"] > last_row["EMA_50"]:
-            return OrderTypes.BUY, last_row["close"]
+            return OrderTypes.BUY, last_row
         else:
-            return OrderTypes.SELL, last_row["close"]
+            return OrderTypes.SELL, last_row
     if (
         prev_row["EMA_10"] < prev_row["EMA_50"]
         and last_row["EMA_10"] > last_row["EMA_50"]
     ):
-        print("Señal de COMPRA detectada (EMA_10 cruzó hacia arriba EMA_50)")
-        return OrderTypes.BUY, last_row["close"]
+        print("Señal de COMPRA")
+        return OrderTypes.BUY, last_row
 
     if (
         prev_row["EMA_10"] > prev_row["EMA_50"]
         and last_row["EMA_10"] < last_row["EMA_50"]
     ):
-        print("Señal de VENTA detectada (EMA_10 cruzó hacia abajo EMA_50)")
-        return "SELL", last_row["close"]
-    return "HOLD", last_row["close"]
+        print("Señal de VENTA")
+        return "SELL", last_row
+    return "HOLD", last_row
+
 
 # en el tintero lo de agregar un stop loss
 def place_order(order_type, client, min_trade_size, current_price):
@@ -91,14 +89,14 @@ def place_order(order_type, client, min_trade_size, current_price):
         save_order(
             transact_time=transact_time_formatted,
             order_type=order_type,
-            price_on_order=current_price,
-            price=executed_price,
+            price_order=current_price,
+            price_final=executed_price,
             quantity=quantity,
             ema_short=EMA_SHORT_PERIOD,
             ema_long=EMA_LONG_PERIOD,
             interval=INTERVAL.value,
             symbol=SYMBOL.value,
-            csv_file="trading_historyV4.csv",
+            csv_filename=state.csv_file_name,
         )
     except Exception as e:
         print(f"❌ ERROR AL EJECUTAR ORDEN: {e}")

@@ -1,3 +1,4 @@
+import state
 from utils.save_data import save_order
 from config import (
     SYMBOL,
@@ -10,7 +11,7 @@ import datetime
 previous_price = None
 
 
-def place_order(order_type, candle, next_candle, csv_name):
+def place_order(order_type, candle, next_candle):
     global previous_price
     transact_time = next_candle["timestamp"].strftime("%Y-%m-%d %H:%M:%S")
     final_price = None
@@ -25,12 +26,12 @@ def place_order(order_type, candle, next_candle, csv_name):
         if final_price is not None:
             previous_price = final_price
             if order_type == "BUY":
-                order_type = "SELL"
+                order_final_type = "SELL"
             else:
-                order_type = "BUY"
+                order_final_type = "BUY"
             save_order(
                 transact_time=transact_time,
-                order_type=order_type,
+                order_type=order_final_type,
                 price_order=candle["close"],
                 price_final=final_price,
                 quantity="STOP_LOSS",
@@ -38,8 +39,9 @@ def place_order(order_type, candle, next_candle, csv_name):
                 ema_long=EMA_LONG_PERIOD,
                 interval=INTERVAL.value,
                 symbol=SYMBOL.value,
-                csv_file=csv_name,
+                csv_filename=state.csv_file_name,
             )
+            return True
 
     # mini take a bit more profit
     if (order_type == "BUY" and next_candle["low"] < candle["low"]) or (
@@ -51,12 +53,12 @@ def place_order(order_type, candle, next_candle, csv_name):
             final_price = candle["high"]
         previous_price = final_price
         if order_type == "BUY":
-            order_type = "SELL"
+            order_final_type = "SELL"
         else:
-            order_type = "BUY"
+            order_final_type = "BUY"
         save_order(
             transact_time=transact_time,
-            order_type=order_type,
+            order_type=order_final_type,
             price_order=candle["close"],
             price_final=final_price,
             quantity="TAKE_BIT_PROFIT",
@@ -64,5 +66,6 @@ def place_order(order_type, candle, next_candle, csv_name):
             ema_long=EMA_LONG_PERIOD,
             interval=INTERVAL.value,
             symbol=SYMBOL.value,
-            csv_file=csv_name,
+            csv_filename=state.csv_file_name,
         )
+        return True

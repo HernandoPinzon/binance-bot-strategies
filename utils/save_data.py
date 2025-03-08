@@ -33,7 +33,7 @@ def save_order(
     ema_long,
     interval,
     symbol,
-    csv_file,
+    csv_filename,
 ):
     """Guarda una orden en CSV y SQL llamando a los servicios correspondientes."""
 
@@ -50,7 +50,7 @@ def save_order(
     ]
 
     # Guardar en CSV
-    save_to_csv(csv_file, HEADERS, row_data)
+    save_to_csv(csv_filename + ".csv", HEADERS, row_data)
 
     # Guardar en SQL (sin cambiar la coma para evitar problemas con cálculos)
     # save_to_sql(DB_PATH, "orders", HEADERS, row_data)

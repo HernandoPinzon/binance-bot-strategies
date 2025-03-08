@@ -9,6 +9,8 @@ class SYMBOLS(Enum):
     ETH_USDT = "ETHUSDT"
     BNB_USDT = "BNBUSDT"
     LTC_USDT = "LTCUSDT"
+    EURI_USDT = "EURIUSDT"
+    BNB_USDC = "BNBUSDC"
 
 
 class OrderTypes:
@@ -34,13 +36,21 @@ IntervalsInSeconds = {
 
 
 # Parámetros de la estrategia
-SYMBOL = SYMBOLS.LTC_USDT
+SYMBOL = SYMBOLS.EURI_USDT
+COIN_NAMES_LIST = {
+    SYMBOLS.BNB_USDT: ("BNB", "USDT"),
+    SYMBOLS.BTC_USDT: ("BTC", "USDT"),
+    SYMBOLS.ETH_USDT: ("ETH", "USDT"),
+    SYMBOLS.LTC_USDT: ("LTC", "USDT"),
+    SYMBOLS.EURI_USDT: ("EURI", "USDT"),
+    SYMBOLS.BNB_USDC: ("BNB", "USDC"),
+}
+
+COIN_NAMES = COIN_NAMES_LIST[SYMBOL]
 INTERVAL = INTERVALS.M1
-TRADE_AMOUNT_USDT = 100  # Cantidad fija en USDT por operación
+TRADE_AMOUNT_USDT = 100
 EMA_SHORT_PERIOD = 10
 EMA_LONG_PERIOD = 50
-
-ENABLE_PLOT = False  # Activa o desactiva el gráfico en tiempo real
 
 DB_CONFIG = {
     "name": os.getenv("DB_NAME"),

@@ -80,27 +80,6 @@ def fetch_historical_data(start_date, end_date):
                     time.sleep(60)  # Pausar por 1 minuto
                     continue
 
-            # Calcula el límite de tiempo para el batch
-            current_end = min(current_start + timedelta(hours=batch_size), end_date)
-
-            # Verifica si ya tenemos estos datos
-            cursor.execute(
-                """
-                SELECT EXISTS(
-                    SELECT 1 FROM candlesticks 
-                    WHERE symbol = %s 
-                    AND timestamp >= %s 
-                    AND timestamp < %s
-                )
-            """,
-                (SYMBOL.value, current_start, current_end),
-            )
-            result = cursor.fetchone()
-            if result and result[0]:
-                print(f"Datos ya existen para {current_start} - {current_end}")
-                current_start = current_end
-                continue
-
             # Fetch datos de Binance
             candles = exchange.fetch_ohlcv(
                 SYMBOL.value,
@@ -196,6 +175,6 @@ check_table_exists()
 
 if __name__ == "__main__":
     # create_table()
-    start_date = datetime(2025, 1, 1)
-    end_date = datetime(2025, 3, 1)
+    start_date = datetime(2024, 11, 1)
+    end_date = datetime(2025, 3, 6)
     fetch_historical_data(start_date, end_date)
