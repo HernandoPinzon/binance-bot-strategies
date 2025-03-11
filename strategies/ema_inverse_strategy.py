@@ -1,10 +1,17 @@
 import asyncio
 import datetime
 
-from config import EMA_LONG_PERIOD, EMA_SHORT_PERIOD, INTERVAL, SYMBOL, TRADE_AMOUNT_USDT
+from config import (
+    EMA_LONG_PERIOD,
+    EMA_SHORT_PERIOD,
+    INTERVAL,
+    SYMBOL,
+    TRADE_AMOUNT_USDT,
+)
 from utils.save_data import save_order
 
-#Cancelar todas las órdenes abiertas antes de la siguiente
+
+# Cancelar todas las órdenes abiertas antes de la siguiente
 def place_order_inverse(order_type, client, min_trade_size, current_price):
     global previous_price
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -65,7 +72,7 @@ def place_order_inverse(order_type, client, min_trade_size, current_price):
             ema_long=EMA_LONG_PERIOD,
             interval=INTERVAL.value,
             symbol=SYMBOL.value,
-            csv_file="trading_historyV4.csv",
+            csv_filename="trading_historyV4.csv",
         )
     except Exception as e:
         print(f"❌ ERROR AL EJECUTAR ORDEN: {e}")

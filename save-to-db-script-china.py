@@ -109,13 +109,14 @@ def fetch_historical_data(start_date, end_date):
                 cursor.execute(
                     """
                     INSERT INTO candlesticks 
-                    (timestamp, symbol, open, high, low, close, volume)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    (timestamp, symbol, interval, open, high, low, close, volume)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT DO NOTHING
-                """,
+                    """,
                     (
                         row["timestamp"],
                         row["symbol"],
+                        INTERVAL.value,  # Agregar la temporalidad
                         row["open"],
                         row["high"],
                         row["low"],
@@ -164,9 +165,9 @@ def check_table_exists():
         )
         exists = cur.fetchone()
         if exists and exists[0]:
-            print("La tabla 'candlesticks' existe")
+            print("La tabla 'candlesticks' EXISTE")
         else:
-            print("La tabla 'candlesticks' no existe")
+            print("La tabla 'candlesticks' NO EXISTE")
         return exists
 
 
@@ -175,6 +176,6 @@ check_table_exists()
 
 if __name__ == "__main__":
     # create_table()
-    start_date = datetime(2024, 11, 1)
-    end_date = datetime(2025, 3, 6)
+    start_date = datetime(2024, 5, 1)
+    end_date = datetime(2025, 3, 10)
     fetch_historical_data(start_date, end_date)

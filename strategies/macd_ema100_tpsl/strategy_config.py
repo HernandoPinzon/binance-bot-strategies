@@ -1,0 +1,2 @@
+STOP_LOSS_PERCENT = 2  # 2% de SL
+TAKE_PROFIT_PERCENT = 2  # 4% de TP

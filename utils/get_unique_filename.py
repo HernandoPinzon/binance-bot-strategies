@@ -5,7 +5,7 @@ def get_unique_filename(file_path):
     """Genera un nombre de archivo único agregando V2, V3, etc., si el archivo ya existe."""
     base, ext = os.path.splitext(file_path)
     counter = 2
-    new_file_path = file_path
+    new_file_path = file_path + ".csv"
 
     while os.path.exists(new_file_path):
         new_file_path = f"{base}_V{counter}{ext}"
