@@ -3,4 +3,4 @@ from strategies.macd_ema100_tpsl.strategy_config import STOP_LOSS_PERCENT, TAKE_
 
 
 def generate_csv_name_with_config_macd_tpsl(name):
-    return f"{name}_{SYMBOL.value}_sl{STOP_LOSS_PERCENT}_tp{TAKE_PROFIT_PERCENT}_"
+    return f"{name}_{SYMBOL.value}_sl{STOP_LOSS_PERCENT}_tp{TAKE_PROFIT_PERCENT}"

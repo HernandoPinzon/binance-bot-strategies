@@ -7,13 +7,11 @@ from strategies.macd_ema100_tpsl.strategy_config import (
     TAKE_PROFIT_PERCENT,
 )
 
-# Diccionario para almacenar órdenes abiertas
-strategy_state.open_orders = (
-    []
-)  # Lista de órdenes activas en backtesting o live trading
+# Lista de órdenes abiertas
+strategy_state.open_orders = []
 
 
-def place_order(order_type, candle):
+def place_order(order_type, candle, next_candle):
     """Coloca una orden y define los niveles de SL y TP en base al porcentaje."""
 
     price_entry = candle["close"]
@@ -33,16 +31,10 @@ def place_order(order_type, candle):
         "price_entry": price_entry,
         "stop_loss": stop_loss,
         "take_profit": take_profit,
-        "timestamp": candle["timestamp"],
+        "entry_time": next_candle["timestamp"],
     }
 
-    strategy_state.open_orders.append(
-        order
-    )  # Agregar la orden a la lista de órdenes abiertas
-
-    print(
-        f"🟢 {order_type} order placed at {price_entry:.2f} | SL: {stop_loss:.2f} | TP: {take_profit:.2f}"
-    )
+    strategy_state.open_orders.append(order)
 
 
 def check_orders(candle):
@@ -52,20 +44,23 @@ def check_orders(candle):
     for order in strategy_state.open_orders:
         if order["order_type"] == "BUY":
             if candle["low"] <= order["stop_loss"]:
-                closed_orders.append((order, "SL"))
+                closed_orders.append((order, "SL", candle["timestamp"]))
             elif candle["high"] >= order["take_profit"]:
-                closed_orders.append((order, "TP"))
+                closed_orders.append((order, "TP", candle["timestamp"]))
 
         elif order["order_type"] == "SELL":
             if candle["high"] >= order["stop_loss"]:
-                closed_orders.append((order, "SL"))
+                closed_orders.append((order, "SL", candle["timestamp"]))
             elif candle["low"] <= order["take_profit"]:
-                closed_orders.append((order, "TP"))
+                closed_orders.append((order, "TP", candle["timestamp"]))
 
     # Eliminar órdenes cerradas y guardarlas en el CSV
-    for order, reason in closed_orders:
+    for order, reason, exit_time in closed_orders:
         save_order(
-            transact_time=candle["timestamp"].strftime("%Y-%m-%d %H:%M:%S"),
+            transact_time=order["entry_time"].strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),  # Guardamos la entrada
+            exit_time=exit_time.strftime("%Y-%m-%d %H:%M:%S"),  # Guardamos la salida
             order_type=order["order_type"],
             price_order=order["price_entry"],
             interval=INTERVAL.value,
@@ -73,6 +68,4 @@ def check_orders(candle):
             csv_filename=state.csv_file_name,
             exit_reason=reason,
         )
-        strategy_state.open_orders.remove(
-            order
-        )  # Eliminar la orden de la lista de órdenes abiertas
+        strategy_state.open_orders.remove(order)

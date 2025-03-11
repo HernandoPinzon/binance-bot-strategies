@@ -14,7 +14,7 @@ from utils.backtesting.data_fetcher import get_data_from_db
 
 load_dotenv()
 
-start_date = datetime(2025, 2, 1)
+start_date = datetime(2024, 10, 1)
 end_date = datetime(2025, 3, 10)
 initial_candles = 100
 
@@ -43,10 +43,7 @@ def main():
         if signal in ["BUY", "SELL"]:
             next_candle = db_data.iloc[i + 1] if i + 1 < len(db_data) else None
             if next_candle is not None:
-                place_order(
-                    signal,
-                    last_candle_checked,
-                )
+                place_order(signal, last_candle_checked, next_candle)
 
         check_orders(last_candle_checked)
 

@@ -11,6 +11,7 @@ HEADERS = [
     "Interval",
     "Symbol",
     "Exit Reason",
+    "Exit Time",
 ]
 
 
@@ -20,12 +21,20 @@ def format_number(value):
 
 
 def save_order(
-    transact_time, order_type, price_order, interval, symbol, csv_filename, exit_reason
+    transact_time,
+    exit_time,
+    order_type,
+    price_order,
+    interval,
+    symbol,
+    csv_filename,
+    exit_reason,
 ):
     """Guarda una orden en CSV y SQL llamando a los servicios correspondientes."""
 
     row_data = [
         transact_time,
+        exit_time,
         order_type,
         format_number(price_order),
         interval,
