@@ -4,7 +4,6 @@ from config import (
     SYMBOL,
     INTERVAL,
 )
-import datetime
 
 previous_price = None
 

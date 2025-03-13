@@ -1,6 +1,5 @@
 import pandas as pd
 import time
-import datetime
 from utils.ccxt_client import exchange
 from config import SYMBOL, INTERVAL
 
@@ -55,7 +54,7 @@ def get_data(queue_trading, _):
 
             # 🔹 Imprimir el último precio y la fecha
             last_row = historical_df.iloc[-1]
-            last_time = last_row["timestamp"].strftime("%M:%S")
+            last_time = last_row["timestamp"].strftime("%H:%M")
 
             if last_row["close"] != last_price or last_time != last_candle_time:
                 print(

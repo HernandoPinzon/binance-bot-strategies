@@ -86,7 +86,6 @@ def adjust_quantity_for_coin1(quantity, step_size):
 
     # Ajustar al múltiplo más cercano de step_size
     adjusted_quantity = math.floor(quantity / step_size) * step_size
-    print(f"with price: {adjusted_quantity*state.init_price}")
 
     # Verificar si cumple con el mínimo notional
     if adjusted_quantity < state.min_notional:
@@ -97,3 +96,15 @@ def adjust_quantity_for_coin1(quantity, step_size):
     # Redondear a la precisión correcta
     decimals = len(str(step_size).split(".")[1]) if "." in str(step_size) else 0
     return round(adjusted_quantity, decimals)
+
+
+def adjust_tick_size(price, tick_size):
+    price = float(price)
+    tick_size = float(tick_size)
+
+    # Ajustar al múltiplo más cercano de tick_size
+    adjusted_price = math.floor(price / tick_size) * tick_size
+
+    # Redondear a la precisión correcta
+    decimals = len(str(tick_size).split(".")[1]) if "." in str(tick_size) else 0
+    return round(adjusted_price, decimals)

@@ -17,6 +17,10 @@ last_signal = None
 init_price = 0.0
 csv_file_name = "template"
 min_notional = 0.0
+tick_size = 0.0
+capital_usdt = 1000
+trades = []
+order_size = 0.01
 
 
 def update_balance(order_type, quantity, price):
@@ -118,3 +122,16 @@ def adjust_balance():
 
     except Exception as e:
         print(f"Error al ajustar balance: {e}")
+
+
+def update_balance2():
+    global balance_coin_1, balance_coin_USDT, client
+    if client is None:
+        return
+    coin_1 = client.get_asset_balance(asset=COIN_NAMES[0])
+    coin_2 = client.get_asset_balance(asset=COIN_NAMES[1])
+    if coin_1 is not None and coin_2 is not None:
+        balance_coin_1 = float(coin_1["free"])
+        balance_coin_USDT = float(coin_2["free"])
+        print(f"Balance de {COIN_NAMES[0]}: {balance_coin_1}")
+        print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")

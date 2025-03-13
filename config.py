@@ -21,6 +21,7 @@ class OrderTypes:
 class INTERVALS(Enum):
     M1 = "1m"
     M5 = "5m"
+    M30 = "30m"
     H1 = "1h"
     D1 = "1d"
     S1 = "1s"
@@ -47,7 +48,7 @@ COIN_NAMES_LIST = {
 }
 
 COIN_NAMES = COIN_NAMES_LIST[SYMBOL]
-INTERVAL = INTERVALS.M5
+INTERVAL = INTERVALS.M30
 TRADE_AMOUNT_USDT = 100
 EMA_SHORT_PERIOD = 10
 EMA_LONG_PERIOD = 50

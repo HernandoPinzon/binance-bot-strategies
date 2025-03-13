@@ -2,7 +2,9 @@ import pandas as pd
 import talib
 
 
-def calculate_macd_plus_ema100(df, fast_length=12, slow_length=26, signal_length=9):
+def calculate_macd_plus_ema100(
+    df, fast_length=12, slow_length=26, signal_length=9, ema=100
+):
     """
     Calcula el MACD, la señal y el histograma.
 
@@ -18,14 +20,12 @@ def calculate_macd_plus_ema100(df, fast_length=12, slow_length=26, signal_length
         slowperiod=slow_length,
         signalperiod=signal_length,
     )
-
-    # Calcular la EMA de 100 períodos
-    df["EMA100"] = talib.EMA(df["close"], timeperiod=100)
+    df["EMA100"] = talib.EMA(df["close"], timeperiod=ema)
 
     return df
 
 
-def check_signals_macd_plus_ema100(df):
+def check_signals_macd_plus_ema100(df, ema_length_up=0.3, ema_length_down=0.3):
     """
     Detecta señales de compra y venta basadas en el MACD y la EMA100.
 
@@ -40,8 +40,10 @@ def check_signals_macd_plus_ema100(df):
     prev_row = df.iloc[-2]
 
     # Verificar si el precio está por encima o por debajo de la EMA100
-    price_above_ema = last_row["close"] > last_row["EMA100"] * 1.003
-    price_below_ema = last_row["close"] < last_row["EMA100"] * 0.997
+    price_above_ema = last_row["close"] > last_row["EMA100"] * (1 + ema_length_up / 100)
+    price_below_ema = last_row["close"] < last_row["EMA100"] * (
+        1 - ema_length_down / 100
+    )
 
     # Detectar señales de compra (crossover) solo si el precio está sobre la EMA100
     if prev_row["Histogram"] < 0 and last_row["Histogram"] >= 0 and price_above_ema:
