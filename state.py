@@ -21,6 +21,7 @@ tick_size = 0.0
 capital_usdt = 1000
 trades = []
 order_size = 0.01
+strategy = "macd"
 
 
 def update_balance(order_type, quantity, price):
@@ -135,3 +136,14 @@ def update_balance2():
         balance_coin_USDT = float(coin_2["free"])
         print(f"Balance de {COIN_NAMES[0]}: {balance_coin_1}")
         print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
+
+
+def update_balance3():
+    global balance_coin_USDT, client
+    if client is None:
+        return
+    account_balance = client.futures_account_balance()
+    for coin in account_balance:
+        if coin["asset"] == COIN_NAMES[1]:
+            balance_coin_USDT = float(coin["balance"])
+    print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")

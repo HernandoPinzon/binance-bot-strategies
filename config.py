@@ -1,5 +1,3 @@
-# config.py
-
 from enum import Enum
 import os
 
@@ -11,6 +9,7 @@ class SYMBOLS(Enum):
     LTC_USDT = "LTCUSDT"
     EURI_USDT = "EURIUSDT"
     BNB_USDC = "BNBUSDC"
+    LTC_USDC = "LTCUSDC"
 
 
 class OrderTypes:
@@ -45,13 +44,15 @@ COIN_NAMES_LIST = {
     SYMBOLS.LTC_USDT: ("LTC", "USDT"),
     SYMBOLS.EURI_USDT: ("EURI", "USDT"),
     SYMBOLS.BNB_USDC: ("BNB", "USDC"),
+    SYMBOLS.LTC_USDC: ("LTC", "USDC"),
 }
 
 COIN_NAMES = COIN_NAMES_LIST[SYMBOL]
-INTERVAL = INTERVALS.M30
+INTERVAL = INTERVALS.M5
 TRADE_AMOUNT_USDT = 100
 EMA_SHORT_PERIOD = 10
 EMA_LONG_PERIOD = 50
+LEVERAGE = 5
 
 DB_CONFIG = {
     "name": os.getenv("DB_NAME"),
@@ -60,3 +61,9 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST"),
     "port": os.getenv("DB_PORT"),
 }
+
+""" SYMBOL = SYMBOLS.LTC_USDC
+INTERVAL = INTERVALS.M1
+COIN_NAMES = COIN_NAMES_LIST[SYMBOL]
+LEVERAGE = 3
+ """
