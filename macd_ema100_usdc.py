@@ -47,7 +47,7 @@ def main():
             continue
         data = queue_trading.get()
         df = calculate_macd_plus_ema100(
-            df=data, ema=50, fast_length=11, slow_length=27, signal_length=9
+            df=data, ema=100, fast_length=12, slow_length=26, signal_length=9
         )
         result = check_signals_macd_plus_ema100(
             df, ema_length_down=0.3, ema_length_up=0.4

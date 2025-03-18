@@ -38,4 +38,4 @@ def place_future_order(order_type, candle):
         quantity=QUANTITY,
         newClientOrderId=f"{state.strategy}-{SYMBOL.value}-{time.time()}",
     )
-    print(f"🟢 order placed at {price:.2f}")
+    print(f"🟢 order placed: {price:.2f}")
