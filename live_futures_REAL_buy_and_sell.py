@@ -1,5 +1,5 @@
 import os
-from config import SYMBOL
+from config import LEVERAGE, SYMBOL
 from future_utils.adjust_tick_price import adjust_tick_price
 from dotenv import load_dotenv
 from binance.client import Client
@@ -30,7 +30,6 @@ print(f"✅ Rango permitido: {min_price:.2f} - {max_price:.2f}")
 
 # Ajustar el precio de entrada ligeramente dentro del rango permitido
 QUANTITY = 0.3  # Tamaño de la orden
-LEVERAGE = 3  # Apalancamiento
 ORDER_SIDE = "SELL"  # Lado de la orden
 
 
