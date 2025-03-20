@@ -144,14 +144,17 @@ def update_balance3():
     global balance_coin_USDT, client
     if client is None:
         return
-    try:
-        account_balance = client.futures_account_balance()
-        for coin in account_balance:
-            if coin["asset"] == COIN_NAMES[1]:
-                balance_coin_USDT = float(coin["balance"])
-        print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
-    except requests.exceptions.ReadTimeout:
-        print("⏳ Tiempo de espera agotado.") # Reintenta la solicitud
-    except BinanceAPIException as e:
-        print(f"❌ Error en la API de Binance: {e}")
-        return None
+    for _ in range(2):
+        try:
+            account_balance = client.futures_account_balance()
+            for coin in account_balance:
+                if coin["asset"] == COIN_NAMES[1]:
+                    balance_coin_USDT = float(coin["balance"])
+            print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
+            return
+        except requests.exceptions.ReadTimeout:
+            print("⏳ Tiempo de espera agotado.")  # Reintenta la solicitud
+            time.sleep(5)
+        except BinanceAPIException as e:
+            print(f"❌ Error en la API de Binance: {e}")
+            return
