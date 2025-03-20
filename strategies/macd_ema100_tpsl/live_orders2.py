@@ -10,7 +10,6 @@ from utils.trading_helpers import (
     adjust_quantity_dor_coinUSDT,
 )
 
-QUANTITY = 0.3
 last_order_candle_time = 0
 
 
@@ -36,7 +35,7 @@ def place_future_order(order_type, candle):
             type=ORDER_TYPE_LIMIT,
             timeInForce="GTC",
             price=str(price),
-            quantity=QUANTITY,
+            quantity=quantity_usdt,
             newClientOrderId=f"{state.strategy}-{SYMBOL.value}-{time.time()}",
         )
     except Exception as e:

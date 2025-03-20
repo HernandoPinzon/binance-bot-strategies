@@ -151,7 +151,7 @@ def update_balance3():
                 balance_coin_USDT = float(coin["balance"])
         print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
     except requests.exceptions.ReadTimeout:
-        print("⏳ Tiempo de espera agotado. Reintentando en 5 segundos...") # Reintenta la solicitud
+        print("⏳ Tiempo de espera agotado.") # Reintenta la solicitud
     except BinanceAPIException as e:
         print(f"❌ Error en la API de Binance: {e}")
         return None
