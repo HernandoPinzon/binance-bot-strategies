@@ -1,4 +1,3 @@
-import pandas as pd
 import talib
 
 from config import INTERVAL, SYMBOL

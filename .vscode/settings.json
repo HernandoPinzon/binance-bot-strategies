@@ -85,7 +85,6 @@
     "trading_backtesting_low_prev_candle.ods",
     "__pycache__",
     ".vscode",
-    "venv",
     "backtestingV111111.csv"
   ],
   "workbench.colorCustomizations": {

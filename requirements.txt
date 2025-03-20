@@ -1,0 +1,5 @@
+python-dotenv
+python-binance
+pandas
+ta-lib
+ccxt
