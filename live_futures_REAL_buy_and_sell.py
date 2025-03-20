@@ -36,7 +36,7 @@ ORDER_SIDE = "SELL"  # Lado de la orden
 
 # 1️⃣ Establecer el apalancamiento
 client.futures_change_leverage(symbol=SYMBOL.value, leverage=LEVERAGE)
-client.futures_change_margin_type(symbol=SYMBOL.value, marginType="ISOLATED")
+#client.futures_change_margin_type(symbol=SYMBOL.value, marginType="ISOLATED")
 
 
 ticker = client.futures_symbol_ticker(symbol=SYMBOL.value)
