@@ -1,6 +1,8 @@
 # state.py
 import time
+import requests
 from datetime import datetime, timezone
+from binance.exceptions import BinanceAPIException
 from config import COIN_NAMES, EMA_LONG_PERIOD, EMA_SHORT_PERIOD, INTERVAL, SYMBOL
 from utils.save_data import save_order
 from utils.trading_helpers import adjust_quantity
@@ -142,8 +144,14 @@ def update_balance3():
     global balance_coin_USDT, client
     if client is None:
         return
-    account_balance = client.futures_account_balance()
-    for coin in account_balance:
-        if coin["asset"] == COIN_NAMES[1]:
-            balance_coin_USDT = float(coin["balance"])
-    print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
+    try:
+        account_balance = client.futures_account_balance()
+        for coin in account_balance:
+            if coin["asset"] == COIN_NAMES[1]:
+                balance_coin_USDT = float(coin["balance"])
+        print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
+    except requests.exceptions.ReadTimeout:
+        print("⏳ Tiempo de espera agotado. Reintentando en 5 segundos...") # Reintenta la solicitud
+    except BinanceAPIException as e:
+        print(f"❌ Error en la API de Binance: {e}")
+        return None
