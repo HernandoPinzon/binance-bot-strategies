@@ -3,6 +3,7 @@
 ## 1️⃣ Instalar `tmux` (si no lo tienes)
 ```bash
 sudo apt update && sudo apt install tmux -y
+sudo pacman -S tmux
 ```
 
 ## 2️⃣ Iniciar una nueva sesión de `tmux` y correr el bot

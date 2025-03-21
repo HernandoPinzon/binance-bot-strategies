@@ -1,10 +1,14 @@
 sudo apt update && sudo apt upgrade -y
 sudo apt install python3 python3-pip -y
+sudo pacman -S python
+sudo pacman -S python-pip
+sudo pacman -S python-venv
+https://ta-lib.org/install/#linux-debian-packages # en arch no hay paquete
 git clone https://github.com/.....
 sudo apt install python3-venv -y
 python3 -m venv venv
 source venv/bin/activate
 wget https://github.com/TA-Lib/ta-lib/releases/download/v0.6.4/ta-lib_0.6.4_amd64.deb
 sudo dpkg -i ta-lib_0.6.4_amd64.deb
-pip3 install -r requirements.txt
+
 CFLAGS="-O2" pip install --no-cache-dir ta-lib # si no hay ram en el vps
