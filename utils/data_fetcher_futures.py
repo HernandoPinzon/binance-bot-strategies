@@ -62,7 +62,6 @@ def get_data(queue_trading, _):
             last_time = last_row["timestamp"].strftime("%H:%M")
 
             if last_row["close"] != last_price or last_time != last_candle_time:
-                print(f"time_candle: {last_time}, {last_row['close']}")
                 last_price = last_row["close"]
                 last_candle_time = last_time
 

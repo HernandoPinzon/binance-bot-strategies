@@ -6,6 +6,7 @@ from binance.enums import (
 )
 import state
 from config import LEVERAGE, SYMBOL
+from utils.logger import log_error, log_info
 from utils.trading_helpers import (
     adjust_quantity_dor_coinUSDT,
 )
@@ -26,8 +27,8 @@ def place_future_order(order_type, candle):
         state.balance_coin_USDT / 4 * LEVERAGE / price,
         state.step_size,
     )
-    print("Cantidad a comprar:", quantity_usdt)
-    print(f"{order_type}...")
+    log_info(f"Cantidad a comprar: {quantity_usdt}")
+    log_info(f"{order_type}...")
     try:
         state.client.futures_create_order(
             symbol=SYMBOL.value,
@@ -38,6 +39,6 @@ def place_future_order(order_type, candle):
             quantity=quantity_usdt,
             newClientOrderId=f"{state.strategy}-{SYMBOL.value}-{time.time()}",
         )
+        log_info(f"🟢 order placed: {price:.2f}")
     except Exception as e:
-        print(f"❌ Error al colocar orden: {e}")
-    print(f"🟢 order placed: {price:.2f}")
+        log_error(f"❌ Error al colocar orden: {e}")

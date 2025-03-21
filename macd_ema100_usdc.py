@@ -10,6 +10,7 @@ from utils.binance_client import get_binance_future_client
 from utils.data_fetcher_futures import get_data
 from dotenv import load_dotenv
 import state
+from utils.logger import log_info
 from utils.trading_helpers import get_trade_sizes
 
 load_dotenv()
@@ -33,11 +34,8 @@ def main():
     # Crear proceso para obtener datos
     data_process = Process(target=get_data, args=(queue_trading, queue_plot))
     data_process.start()
-
-    # Esperar hasta que haya datos en la cola de trading
     print("Esperando datos de Binance", end="")
     while queue_trading.empty():
-        print(".", end="")
         time.sleep(1)
     print("\nDatos recibidos")
 
@@ -55,7 +53,6 @@ def main():
         if result is not None:
             signal, candle = result
             if signal in ["BUY", "SELL"]:
-                print(f"Señal: {signal}")
                 place_future_order(signal, candle)
         time.sleep(1)
 
@@ -70,7 +67,7 @@ if __name__ == "__main__":
             if f["filterType"] == "NOTIONAL":
                 state.min_notional = float(f["minNotional"])
                 break
-        print(f"El mínimo notional permitido es: {state.min_notional}")
-        print("Precio inicial:", state.init_price)
-        print(f"Balance de {COIN_NAMES[1]}: {state.balance_coin_USDT}")
+        log_info(f"El mínimo notional permitido es: {state.min_notional}")
+        log_info(f"Precio inicial: {state.init_price}")
+        log_info(f"Balance de {COIN_NAMES[1]}: {state.balance_coin_USDT}")
         main()
