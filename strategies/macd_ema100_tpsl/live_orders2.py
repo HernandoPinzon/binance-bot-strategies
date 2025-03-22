@@ -27,7 +27,6 @@ def place_future_order(order_type, candle):
         state.balance_coin_USDT / 4 * LEVERAGE / price,
         state.step_size,
     )
-    log_info(f"Cantidad a comprar: {quantity_usdt}")
     log_info(f"{order_type}...")
     try:
         state.client.futures_create_order(
@@ -39,6 +38,6 @@ def place_future_order(order_type, candle):
             quantity=quantity_usdt,
             newClientOrderId=f"{state.strategy}-{SYMBOL.value}-{time.time()}",
         )
-        log_info(f"🟢 order placed: {price:.2f}")
+        log_info(f"Ema: {candle['EMA100']:.2f} - Precio: {price:.2f}")
     except Exception as e:
         log_error(f"❌ Error al colocar orden: {e}")

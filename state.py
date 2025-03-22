@@ -4,6 +4,7 @@ import requests
 from datetime import datetime, timezone
 from binance.exceptions import BinanceAPIException
 from config import COIN_NAMES, EMA_LONG_PERIOD, EMA_SHORT_PERIOD, INTERVAL, SYMBOL
+from utils.logger import log_error, log_info
 from utils.save_data import save_order
 from utils.trading_helpers import adjust_quantity
 
@@ -150,13 +151,13 @@ def update_balance3():
             for coin in account_balance:
                 if coin["asset"] == COIN_NAMES[1]:
                     balance_coin_USDT = float(coin["balance"])
-            print(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
+            log_info(f"Balance de {COIN_NAMES[1]}: {balance_coin_USDT}")
             return
         except requests.exceptions.ReadTimeout:
-            print(
+            log_error(
                 "⏳ Tiempo de espera agotado, intentando de nuevo.."
             )  # Intenta la solicitud nuevamente
             time.sleep(2)
         except BinanceAPIException as e:
-            print(f"❌ Error en la API de Binance: {e}")
+            log_error(f"❌ Error en la API de Binance: {e}")
             return

@@ -88,8 +88,6 @@ def place_order(order_type, candle, next_candle):
             if trade["order_type"] == "BUY":
                 compre = trade["quantity"] / trade["price_order"]
                 vendo = compre * candle["close"]
-                print(f"Compre: {compre} a {trade['price_order']}")
-                print(f"Vendo: {vendo} a {candle['close']}")
                 state.capital_usdt = state.capital_usdt + vendo
                 trade["filled"] = True
         state.trades.append(

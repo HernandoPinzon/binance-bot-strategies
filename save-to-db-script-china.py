@@ -176,6 +176,6 @@ check_table_exists()
 
 if __name__ == "__main__":
     # create_table()
-    start_date = datetime(2024, 5, 1)
-    end_date = datetime(2025, 3, 10)
+    start_date = datetime(2025, 1, 1)
+    end_date = datetime(2025, 3, 21)
     fetch_historical_data(start_date, end_date)

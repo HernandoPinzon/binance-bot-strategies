@@ -1,1 +1,0 @@
-csv_file_name= "inverse_precandle"

@@ -45,6 +45,7 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
+    "venv": true,
     "trading_backtesting_low_prev_candle_5_25EMA_3MONTHS_BINANCE.ods": true,
     "trading_backtesting_low_prev_candle_5_25EMA_3MONTHS_BITCOIN.ods": true,
     "trading_backtesting_low_prev_candle_5_25EMA_3MONTHS.ods": true,
@@ -63,8 +64,8 @@
     "trading_backtesting_low_prev_candle.ods": true,
     "__pycache__": true,
     ".vscode": true,
-    "venv": true,
-    "backtestingV111111.csv": true
+    "backtestingV111111.csv": true,
+    "bmsb_LTCUSDT_10_50.csv": true
   },
   "hide-files.files": [
     "trading_backtesting_low_prev_candle_5_25EMA_3MONTHS_BINANCE.ods",
@@ -85,7 +86,8 @@
     "trading_backtesting_low_prev_candle.ods",
     "__pycache__",
     ".vscode",
-    "backtestingV111111.csv"
+    "backtestingV111111.csv",
+    "bmsb_LTCUSDT_10_50.csv"
   ],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#fe73f3",

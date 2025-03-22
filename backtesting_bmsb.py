@@ -12,8 +12,8 @@ from utils.backtesting.data_fetcher import get_data_from_db
 
 load_dotenv()
 
-start_date = datetime(2025, 2, 20)
-end_date = datetime(2025, 3, 10)
+start_date = datetime(2025, 1, 1)
+end_date = datetime(2025, 3, 21)
 initial_candles = 100
 
 state.csv_file_name = get_unique_filename(generate_csv_name_with_config("bmsb"))
