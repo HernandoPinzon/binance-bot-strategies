@@ -1,6 +1,6 @@
 import time
 from binance.enums import (
-    ORDER_TYPE_LIMIT,
+    ORDER_TYPE_MARKET,
     SIDE_BUY,
     SIDE_SELL,
 )
@@ -32,12 +32,14 @@ def place_future_order(order_type, candle):
         state.client.futures_create_order(
             symbol=SYMBOL.value,
             side=SIDE_BUY if order_type == "BUY" else SIDE_SELL,
-            type=ORDER_TYPE_LIMIT,
+            type=ORDER_TYPE_MARKET,
             timeInForce="GTC",
-            price=str(price),
             quantity=quantity_usdt,
             newClientOrderId=f"{state.strategy}-{SYMBOL.value}-{time.time()}",
         )
         log_info(f"Ema: {candle['EMA100']:.2f} - Precio: {price:.2f}")
+        log_info(
+            f"Macd: {candle['MACD']:.2f} - Signal: {candle['SIGNAL']:.2f} - Histogram: {candle['HISTOGRAM']:.2f}"
+        )
     except Exception as e:
         log_error(f"❌ Error al colocar orden: {e}")

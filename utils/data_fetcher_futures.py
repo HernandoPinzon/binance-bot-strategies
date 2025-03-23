@@ -1,8 +1,8 @@
 import pandas as pd
 import time
 import state
-from utils.ccxt_client import exchange
 from config import SYMBOL, INTERVAL
+from utils.logger import log_info
 
 
 def get_data(queue_trading, _):
@@ -17,12 +17,9 @@ def get_data(queue_trading, _):
         limit = 100 if first_run else 1
 
         try:
-            # 🔹 Obtener datos de velas de futuros
             response = state.client.futures_klines(
                 symbol=SYMBOL.value, interval=INTERVAL.value, limit=limit
             )
-
-            # 🔹 Convertir los datos en DataFrame
             new_df = pd.DataFrame(
                 response,
                 columns=[
@@ -53,9 +50,9 @@ def get_data(queue_trading, _):
                     historical_df = pd.concat(
                         [historical_df, new_df], ignore_index=True
                     ).tail(100)
-
             while not queue_trading.empty():
                 queue_trading.get()
+
             queue_trading.put(historical_df)
 
             last_row = historical_df.iloc[-1]
@@ -67,5 +64,4 @@ def get_data(queue_trading, _):
 
         except Exception as e:
             print(f"❌ Error al obtener datos: {e}")
-
-        time.sleep(1)
+        time.sleep(2)
