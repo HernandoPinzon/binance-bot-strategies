@@ -25,10 +25,10 @@ def check_signals_macd_plus_ema100(df, ema_length_up=0.3, ema_length_down=0.3):
         1 - ema_length_down / 100
     )
     if prev_row["Histogram"] < 0 and last_row["Histogram"] >= 0 and price_above_ema:
-        return "BUY", last_row
+        return "BUY", last_row, prev_row
 
     if prev_row["Histogram"] > 0 and last_row["Histogram"] <= 0 and price_below_ema:
-        return "SELL", last_row
+        return "SELL", last_row, prev_row
 
     # Si no hay señal, mantener
-    return "HOLD", last_row
+    return "HOLD", last_row, prev_row

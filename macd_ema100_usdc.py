@@ -51,9 +51,9 @@ def main():
             df, ema_length_down=0.3, ema_length_up=0.4
         )
         if result is not None:
-            signal, candle = result
+            signal, candle, prev_candle = result
             if signal in ["BUY", "SELL"]:
-                place_future_order(signal, candle)
+                place_future_order(signal, candle, prev_candle)
         time.sleep(1)
 
 
